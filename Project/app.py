@@ -3,6 +3,7 @@
 
 # In[2]:
 import os
+from tensorflow.keras.models import load_model
 
 # Checking if file exists
 file_path = "C:/Users/USER/Downloads/Leslie_network_attack_model.h5"
@@ -17,7 +18,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.models import load_model
+#from tensorflow.keras.models import load_model
 
 # Loading the trained model
 #model = load_model("C:/Users/USER/Downloads/Leslie_network_attack_model.h5")
