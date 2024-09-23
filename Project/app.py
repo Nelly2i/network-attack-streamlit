@@ -2,6 +2,15 @@
 # coding: utf-8
 
 # In[2]:
+import os
+
+# Checking if file exists
+file_path = "C:/Users/USER/Downloads/Leslie_network_attack_model.h5"
+if not os.path.exists(file_path):
+    print(f"File not found: {file_path}")
+
+# Loading model
+model = load_model(file_path)
 
 
 import streamlit as st
@@ -11,7 +20,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Loading the trained model
-model = load_model("C:/Users/USER/Downloads/Leslie_network_attack_model.h5")
+#model = load_model("C:/Users/USER/Downloads/Leslie_network_attack_model.h5")
 
 # Defining the selected feature names
 top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
