@@ -41,8 +41,8 @@ if uploaded_file is not None:
         if st.button("Predict"):
           try:
         #Applying one hot encoding to the 'service' column if it exists
-        if 'service' in data.columns:
-          data = pd.get_dummies(data, columns=['service'])
+              if 'service' in data.columns:
+                data = pd.get_dummies(data, columns=['service'])
         # Filtering out the selected features
         filtered_data = data[top_10_features]
 
