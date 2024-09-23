@@ -39,7 +39,7 @@ if uploaded_file is not None:
         
         # Button to trigger prediction
         if st.button("Predict"):
-    try:
+          try:
         #Applying one hot encoding to the 'service' column if it exists
         if 'service' in data.columns:
             data = pd.get_dummies(data, columns=['service'])
