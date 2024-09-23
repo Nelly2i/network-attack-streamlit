@@ -39,23 +39,42 @@ if uploaded_file is not None:
         
         # Button to trigger prediction
         if st.button("Predict"):
-            # Preparing the data for prediction (reshape if necessary)
-            data_for_prediction = np.array(filtered_data).astype(np.float32)
-            data_for_prediction = np.array(filtered_data).reshape(filtered_data.shape[0], 1, filtered_data.shape[1])
+    try:
+        # Filter out the selected features
+        filtered_data = data[top_10_features]
+
+        # Check for non-numeric values and encode them if necessary
+        for col in filtered_data.columns:
+            if filtered_data[col].dtype == 'object':  # If the column is categorical
+                st.write(f"Encoding column: {col}")
+                filtered_data[col] = filtered_data[col].astype('category').cat.codes
+
+        # Convert the filtered data to NumPy array and reshape for prediction
+        data_for_prediction = np.array(filtered_data).astype(np.float32)
+
+        # Reshape the data if needed (based on the input shape required by your model)
+        data_for_prediction = data_for_prediction.reshape(-1, len(selected_features))
+
+        # Make predictions
+        predictions = model.predict(data_for_prediction)
+
+
+          
+          # Preparing the data for prediction (reshape if necessary)
             
             # Making predictions using the model
-            predictions = model.predict(data_for_prediction)
+           # predictions = model.predict(data_for_prediction)
             
             # Converting predictions to class labels
-            predicted_classes = np.argmax(predictions, axis=1)
+            #predicted_classes = np.argmax(predictions, axis=1)
             
             # Displaying predictions
-            st.write("Predictions:")
-            st.write(predicted_classes)
-    else:
-        st.error("The uploaded dataset does not contain the required feature columns.")
-else:
-    st.write("Please upload a dataset for predictions.")
+           # st.write("Predictions:")
+            #st.write(predicted_classes)
+  #  else:
+        #st.error("The uploaded dataset does not contain the required feature columns.")
+#else:
+    #st.write("Please upload a dataset for predictions.")
 
 
 # In[3]:
