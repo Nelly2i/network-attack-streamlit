@@ -4,6 +4,7 @@
 # In[2]:
 
 import streamlit as st
+#import seaborn as sns
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -20,11 +21,11 @@ top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host sam
 st.title("Network Attack Prediction App")
 
 # Uploading dataset for prediction
-uploaded_file1 = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key='uploader1')
+uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key='unique_uploader')
 
-if uploaded_file1 is not None:
+if uploaded_file is not None:
     # Reading the uploaded CSV file
-    uploaded_data = pd.read_csv(uploaded_file1)
+    uploaded_data = pd.read_csv(uploaded_file)
     
     # Displaying the first few rows of the uploaded data
     st.write("Uploaded Dataset Preview:")
@@ -61,15 +62,13 @@ else:
 
 import plotly.express as px
 import plotly.graph_objs as go
-import streamlit as st
-import pandas as pd
 
 # Loading the dataset
-uploaded_file2 = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key='uploader2')
-if uploaded_file2 is not None:
-    data = pd.read_csv(uploaded_file2)
-    st.write('Dataset Preview')
-    st.write(data.head())
+#uploaded_file2 = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key='uploader2')
+#if uploaded_file2 is not None:
+   # data = pd.read_csv(uploaded_file2)
+    #st.write('Dataset Preview')
+    #st.write(data.head())
 
 # Example: Correlation heatmap
 if st.button("Show Correlation Heatmap"):
