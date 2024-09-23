@@ -20,11 +20,11 @@ top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host sam
 st.title("Network Attack Prediction App")
 
 # Uploading dataset for prediction
-uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
+uploaded_file1 = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
 
-if uploaded_file is not None:
+if uploaded_file1 is not None:
     # Reading the uploaded CSV file
-    uploaded_data = pd.read_csv(uploaded_file)
+    uploaded_data = pd.read_csv(uploaded_file1)
     
     # Displaying the first few rows of the uploaded data
     st.write("Uploaded Dataset Preview:")
@@ -65,9 +65,9 @@ import streamlit as st
 import pandas as pd
 
 # Loading the dataset
-uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
-if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
+uploaded_file2 = st.file_uploader("Upload your dataset (CSV)", type=["csv"])
+if uploaded_file2 is not None:
+    data = pd.read_csv(uploaded_file2)
     st.write('Dataset Preview')
     st.write(data.head())
 
