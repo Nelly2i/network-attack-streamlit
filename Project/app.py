@@ -15,7 +15,7 @@ model = load_model('Leslie_network_attack_model.h5')
 
 # Defining the selected feature names
 top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
-                   'dst host same src port rate', 'diff srv rate', 'service', 'src bytes', 'dst host diff srv rate']
+                   'dst host same src port rate', 'diff srv rate', 'service_eco_i', 'src bytes', 'dst host diff srv rate']
 
 # Streamlit app title
 st.title("Network Attack Prediction App")
@@ -40,22 +40,25 @@ if uploaded_file is not None:
         # Button to trigger prediction
         if st.button("Predict"):
     try:
-        # Filter out the selected features
+        #Applying one hot encoding to the 'service' column if it exists
+        if 'service' in data.columns:
+            data = pd.get_dummies(data, columns=['service'])
+        # Filtering out the selected features
         filtered_data = data[top_10_features]
 
-        # Check for non-numeric values and encode them if necessary
+        # Checking for non-numeric values and encode them if necessary
         for col in filtered_data.columns:
             if filtered_data[col].dtype == 'object':  # If the column is categorical
                 st.write(f"Encoding column: {col}")
                 filtered_data[col] = filtered_data[col].astype('category').cat.codes
 
-        # Convert the filtered data to NumPy array and reshape for prediction
+        # Converting the filtered data to NumPy array and reshape for prediction
         data_for_prediction = np.array(filtered_data).astype(np.float32)
 
-        # Reshape the data if needed (based on the input shape required by your model)
+        # Reshaping the data if needed (based on the input shape required by the model)
         data_for_prediction = data_for_prediction.reshape(-1, len(selected_features))
 
-        # Make predictions
+        # Making predictions
         predictions = model.predict(data_for_prediction)
 
 
@@ -65,11 +68,15 @@ if uploaded_file is not None:
             # Making predictions using the model
            # predictions = model.predict(data_for_prediction)
             
-            # Converting predictions to class labels
-            #predicted_classes = np.argmax(predictions, axis=1)
+         #Converting predictions to class labels
+          predicted_classes = np.argmax(predictions, axis=1)
             
-            # Displaying predictions
-           # st.write("Predictions:")
+          # Displaying predictions
+          st.write(f'Predicted_classes: {predicted_classes}')
+except KeyError as e:
+    st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
+except Exception as e:
+    st.error(f'An error occurred: {e}')
             #st.write(predicted_classes)
   #  else:
         #st.error("The uploaded dataset does not contain the required feature columns.")
