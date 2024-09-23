@@ -43,11 +43,10 @@ if uploaded_file is not None:
         #Applying one hot encoding to the 'service' column if it exists
                if 'service' in data.columns:
                    data = pd.get_dummies(data, columns=['service'])
-            try:
         # Filtering out the selected features
                 filtered_data = data[top_10_features]
-            except Exception as e
-                print(f'Error: {str(e)}')
+            #except Exception as e
+             #   print(f'Error: {str(e)}')
 
         # Checking for non-numeric values and encode them if necessary
         for col in filtered_data.columns:
