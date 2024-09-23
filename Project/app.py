@@ -14,8 +14,8 @@ from tensorflow.keras.models import load_model
 model = load_model('Leslie_network_attack_model.h5')
 
 # Defining the selected feature names
-top_9_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
-                   'dst host same src port rate', 'diff srv rate', 'src bytes', 'dst host diff srv rate']
+top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
+                   'dst host same src port rate', 'diff srv rate', 'service', 'src bytes', 'dst host diff srv rate']
 
 # Streamlit app title
 st.title("Network Attack Prediction App")
@@ -32,8 +32,8 @@ if uploaded_file is not None:
     st.write(uploaded_data.head())
     
     # Selecting only the feature columns from the uploaded dataset
-    if set(top_9_features).issubset(uploaded_data.columns):
-        filtered_data = uploaded_data[top_9_features]
+    if set(top_10_features).issubset(uploaded_data.columns):
+        filtered_data = uploaded_data[top_10_features]
         st.write("Filtered Data (Only Selected Features):")
         st.write(filtered_data.head())
         
