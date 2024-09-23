@@ -55,7 +55,7 @@ if uploaded_file is not None:
                 data_for_prediction = np.array(filtered_data).astype(np.float32)
 
                 # Reshape the data if needed (based on the input shape required by the model)
-                data_for_prediction = data_for_prediction.reshape(-1, len(filtered_data.columns))
+                data_for_prediction = data_for_prediction.reshape(-1, 1, len(filtered_data.columns))
 
                 # Make predictions using the model
                 predictions = model.predict(data_for_prediction)
