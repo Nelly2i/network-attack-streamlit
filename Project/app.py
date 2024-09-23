@@ -40,6 +40,7 @@ if uploaded_file is not None:
         # Button to trigger prediction
         if st.button("Predict"):
             # Preparing the data for prediction (reshape if necessary)
+            data_for_prediction = np.array(filtered_data).astype(np.float32)
             data_for_prediction = np.array(filtered_data).reshape(filtered_data.shape[0], 1, filtered_data.shape[1])
             
             # Making predictions using the model
