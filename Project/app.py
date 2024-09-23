@@ -45,30 +45,30 @@ if uploaded_file is not None:
             st.write(filtered_data.head())
             
             
-# Button to trigger prediction
-if st.button("Predict"):
-    try:
-        # Ensure no categorical values are present
-        for col in filtered_data.columns:
-            if filtered_data[col].dtype == 'object':
-                st.write(f"Encoding column: {col}")
-                filtered_data[col] = filtered_data[col].astype('category').cat.codes
+      # Button to trigger prediction
+      if st.button("Predict"):
+          try:
+              # Ensure no categorical values are present
+              for col in filtered_data.columns:
+                  if filtered_data[col].dtype == 'object':
+                      st.write(f"Encoding column: {col}")
+                      filtered_data[col] = filtered_data[col].astype('category').cat.codes
 
-        # Convert the filtered data to NumPy array for prediction
-        data_for_prediction = np.array(filtered_data).astype(np.float32)
+              # Convert the filtered data to NumPy array for prediction
+              data_for_prediction = np.array(filtered_data).astype(np.float32)
 
-        # Reshape the data for the model: (batch_size, 1, number_of_features)
-        # Add a new axis to create the required 3D input shape for the model
-        data_for_prediction = data_for_prediction.reshape(-1, 1, data_for_prediction.shape[1])
+              # Reshape the data for the model: (batch_size, 1, number_of_features)
+              # Add a new axis to create the required 3D input shape for the model
+              data_for_prediction = data_for_prediction.reshape(-1, 1, data_for_prediction.shape[1])
 
-        # Make predictions using the model
-        predictions = model.predict(data_for_prediction)
+              # Make predictions using the model
+              predictions = model.predict(data_for_prediction)
 
-        # Convert predictions to class labels
-        predicted_classes = np.argmax(predictions, axis=1)
+              # Convert predictions to class labels
+              predicted_classes = np.argmax(predictions, axis=1)
 
-        # Display predictions
-        st.write(f'Predicted Classes: {predicted_classes}')
+              # Display predictions
+              st.write(f'Predicted Classes: {predicted_classes}')
         
     except KeyError as e:
         st.error(f"Error: {e}. Please ensure the dataset contains the necessary features.")
