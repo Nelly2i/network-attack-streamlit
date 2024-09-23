@@ -73,18 +73,17 @@ The model was evaluated using various metrics:
 
 ## Example Output
 
-plaintext
-               precision    recall  f1-score   support
+    precision    recall  f1-score   support
 
-     ipsweep       1.00      1.00      1.00      1088
-       satan       1.00      0.99      1.00       710
-   portsweep       0.99      1.00      1.00       410
-        back       1.00      1.00      1.00       268
-      normal       0.98      1.00      0.99       122
+    ipsweep       1.00      1.00      1.00      1088
+    satan       1.00      1.00      1.00       710
+    portsweep       1.00      1.00      1.00       410
+    back       1.00      1.00      1.00       268
+    normal       0.98      1.00      0.99       122
 
     accuracy                           1.00      2598
-   macro avg       0.99      1.00      1.00      2598
-weighted avg       1.00      1.00      1.00      2598
+    macro avg       1.00      1.00      1.00      2598
+    weighted avg       1.00      1.00      1.00      2598
 
 
 ## Technologies Used
