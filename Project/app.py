@@ -57,7 +57,7 @@ if uploaded_file is not None:
             data_for_prediction = np.array(filtered_data).astype(np.float32)
 
             # Reshape the data for the model: (batch_size, 1, number_of_features)
-            data_for_prediction = data_for_prediction.reshape(data_for_predicition.shape[0], 1, data_for_prediction.shape[1])
+            data_for_prediction = data_for_prediction.reshape(data_for_prediction.shape[0], 1, data_for_prediction.shape[1])
 
             # Making predictions using the model
             predictions = model.predict(data_for_prediction)
