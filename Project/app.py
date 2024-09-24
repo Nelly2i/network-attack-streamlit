@@ -88,7 +88,7 @@ if uploaded_file is not None:
                 st.error(f'An error occurred: {e}')
 
 # Correlation Heatmap Option
-numeric_columns = filtered_df.select_dtypes(include=[np.number])
+numeric_columns = filtered_data.select_dtypes(include=[np.number])
 if st.button("Show Correlation Heatmap"):
     correlation_matrix = numeric_columns.corr()
     fig = px.imshow(correlation_matrix, text_auto=True)
