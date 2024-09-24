@@ -86,9 +86,10 @@ if uploaded_file is not None:
                 st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
             except Exception as e:
                 st.error(f'An error occurred: {e}')
-
-# Correlation Heatmap Option
+              
+filtered_data = data[top_10_features]
 numeric_columns = filtered_data.select_dtypes(include=[np.number])
+# Correlation Heatmap Option
 if st.button("Show Correlation Heatmap"):
     correlation_matrix = numeric_columns.corr()
     fig = px.imshow(correlation_matrix, text_auto=True)
