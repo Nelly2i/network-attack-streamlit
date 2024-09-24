@@ -86,8 +86,9 @@ if uploaded_file is not None:
                 st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
             except Exception as e:
                 st.error(f'An error occurred: {e}')
+              
  if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
+   data = pd.read_csv(uploaded_file)
    filtered_data = data[top_10_features]
 numeric_columns = filtered_data.select_dtypes(include=[np.number])
 
