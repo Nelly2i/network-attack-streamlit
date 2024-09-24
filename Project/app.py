@@ -6,13 +6,17 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+import plotly.express as px
 
 # Loading the trained model
 model = load_model('Leslie_network_attack_model.h5')
 
 # Defining the selected feature names
-top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
-                   'dst host same src port rate', 'diff srv rate', 'service_eco_i', 'src bytes', 'dst host diff srv rate']
+top_10_features = [
+    'dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 
+    'count', 'dst host count', 'dst host same src port rate', 'diff srv rate', 
+    'service_eco_i', 'src bytes', 'dst host diff srv rate'
+]
 
 # Streamlit app title
 st.title("Network Attack Prediction App")
@@ -24,75 +28,81 @@ uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key=
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
 
-    # One-hot encoding the 'service' column if it exists
-    if 'service' in data.columns:
-        service_encoded = pd.get_dummies(data['service'], prefix='service')
+    try:
+        # One-hot encoding the 'service' column
+        if 'service' in data.columns:
+            service_encoded = pd.get_dummies(data['service'], prefix='service')
 
-        # Remove the original 'service' column and add the one-hot encoded columns
-        data = data.drop('service', axis=1)
-        data = pd.concat([data, service_encoded], axis=1)
+            # Remove the original 'service' column and add the one-hot encoded columns
+            data = data.drop('service', axis=1)
+            data = pd.concat([data, service_encoded], axis=1)
 
-    # Displaying the first few rows of the uploaded data
-    st.write("Uploaded Dataset Preview:")
-    st.write(data.head())
+        # Displaying the first few rows of the uploaded data
+        st.write("Uploaded Dataset Preview:")
+        st.write(data.head())
 
-    # Selecting only the feature columns from the uploaded dataset
-    if set(top_10_features).issubset(data.columns):
-        filtered_data = data[top_10_features]
-        st.write("Filtered Data (Only Selected Features):")
-        st.write(filtered_data.head())
+        # Selecting only the feature columns from the uploaded dataset
+        if set(top_10_features).issubset(data.columns):
+            filtered_data = data[top_10_features]
+            st.write("Filtered Data (Only Selected Features):")
+            st.write(filtered_data.head())
 
-        # Button to trigger prediction
-        if st.button("Predict"):
-            try:
-                # Checking for non-numeric values and encoding them if necessary
-                for col in filtered_data.columns:
-                    if filtered_data[col].dtype == 'object':  # If the column is categorical
-                        st.write(f"Encoding column: {col}")
-                        filtered_data[col] = filtered_data[col].astype('category').cat.codes
+            # Button to trigger prediction
+            if st.button("Predict"):
+                try:
+                    # Checking for non-numeric values and encode them if necessary
+                    for col in filtered_data.columns:
+                        if filtered_data[col].dtype == 'object':  # If the column is categorical
+                            st.write(f"Encoding column: {col}")
+                            filtered_data[col] = filtered_data[col].astype('category').cat.codes
 
-                # Converting the filtered data to NumPy array and reshape for prediction
-                data_for_prediction = np.array(filtered_data).astype(np.float32)
+                    # Converting the filtered data to NumPy array and reshape for prediction
+                    data_for_prediction = np.array(filtered_data).astype(np.float32)
 
-                # Reshaping the data to fit the model's expected input shape
-                data_for_prediction = data_for_prediction.reshape(data_for_prediction.shape[0], 1, data_for_prediction.shape[1])
+                    # Reshaping the data to match the input shape of the model (batch_size, sequence_length, num_features)
+                    data_for_prediction = data_for_prediction.reshape(-1, 1, len(top_10_features))
 
-                # Making predictions
-                predictions = model.predict(data_for_prediction)
+                    # Making predictions
+                    predictions = model.predict(data_for_prediction)
 
-                # Converting predictions to class labels
-                predicted_classes = np.argmax(predictions, axis=1)
+                    # Mapping prediction to attack types
+                    attack_mapping = {0: 'ipsweep', 1: 'satan', 2: 'portsweep', 3: 'back', 4: 'normal'}
+                    predicted_classes = np.argmax(predictions, axis=1)
+                    predicted_attacks = [attack_mapping[cls] for cls in predicted_classes]
 
-                # Define the possible attack classes based on your model
-                attack_classes = ['normal', 'back', 'ipsweep', 'portsweep', 'satan']
+                    # Creating DataFrame for results
+                    results = pd.DataFrame({
+                        'Id': data.index,
+                        'type_of_attack': predicted_attacks
+                    })
 
-                # Mapping predicted class numbers to attack types
-                predicted_attacks = [attack_classes[i] for i in predicted_classes]
+                    # Display the results
+                    st.write("Prediction Results:")
+                    st.write(results)
 
-                # Create a DataFrame with the Id and predicted attack types
-                output_df = pd.DataFrame({
-                    'Id': data.index + 1,  # Assuming the Id should just be the row number + 1
-                    'type_of_attack': predicted_attacks
-                })
+                except KeyError as e:
+                    st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
+                except Exception as e:
+                    st.error(f'An error occurred: {e}')
 
-                # Display the output as a table on the app
-                st.write("Predicted Attack Types:")
-                st.write(output_df)
+        else:
+            st.error("The uploaded dataset does not contain the required feature columns.")
 
-                # Optionally: Allow users to download the predictions as a CSV
-                st.download_button(label="Download Predictions as CSV", data=output_df.to_csv(index=False), mime='text/csv')
+    except Exception as e:
+        st.error(f"An error occurred while processing the data: {e}")
 
-            except KeyError as e:
-                st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
-            except Exception as e:
-                st.error(f'An error occurred: {e}')
-              
-data = pd.read_csv(uploaded_file)
-filtered_data = data[top_10_features]
-numeric_columns = filtered_data.select_dtypes(include=[np.number])
-
-# Correlation Heatmap Option
+# Correlation Heatmap using Plotly
 if st.button("Show Correlation Heatmap"):
-    correlation_matrix = numeric_columns.corr()
-    fig = px.imshow(correlation_matrix, text_auto=True)
-    st.plotly_chart(fig)
+    try:
+        # Select only numeric columns for correlation
+        numeric_columns = data.select_dtypes(include=[np.number])
+
+        # Compute the correlation matrix
+        correlation_matrix = numeric_columns.corr()
+
+        # Plotting the correlation heatmap using Plotly
+        fig = px.imshow(correlation_matrix, text_auto=True)
+        st.plotly_chart(fig)
+
+    except Exception as e:
+        st.error(f"An error occurred while generating the heatmap: {e
