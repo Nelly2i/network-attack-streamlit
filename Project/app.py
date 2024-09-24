@@ -29,7 +29,7 @@ if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
 
     try:
-        # One-hot encoding the 'service' column
+        # One-hot encoding the 'service' column if it exists in the dataset
         if 'service' in data.columns:
             service_encoded = pd.get_dummies(data['service'], prefix='service')
 
@@ -53,7 +53,9 @@ if uploaded_file is not None:
                     # Converting the filtered data to NumPy array for prediction
                     data_for_prediction = np.array(filtered_data).astype(np.float32)
 
-                    # Note: Don't reshape the data to (batch_size, 1, num_features), just keep it as (batch_size, num_features)
+                    # Reshaping to match the model's expected input shape (batch_size, 1, num_features)
+                    data_for_prediction = np.expand_dims(data_for_prediction, axis=1)
+
                     # Making predictions
                     predictions = model.predict(data_for_prediction)
 
@@ -66,7 +68,7 @@ if uploaded_file is not None:
                     st.write(predicted_attacks)
 
                     # Saving predictions to a CSV file
-                    result_df = pd.DataFrame({'Id': data.index, 'type_of_attack': predicted_attacks})
+                    result_df = pd.DataFrame({'Id': data.index + 1, 'type_of_attack': predicted_attacks})
                     result_df.to_csv('predicted_attacks.csv', index=False)
                     st.write("Download the predictions:", result_df)
                     st.download_button(label="Download CSV", data=result_df.to_csv(index=False), file_name='predicted_attacks.csv', mime='text/csv')
