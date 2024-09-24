@@ -87,9 +87,8 @@ if uploaded_file is not None:
             except Exception as e:
                 st.error(f'An error occurred: {e}')
               
- if uploaded_file is not None:
-   data = pd.read_csv(uploaded_file)
-   filtered_data = data[top_10_features]
+data = pd.read_csv(uploaded_file)
+filtered_data = data[top_10_features]
 numeric_columns = filtered_data.select_dtypes(include=[np.number])
 
 # Correlation Heatmap Option
