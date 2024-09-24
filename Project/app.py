@@ -92,7 +92,7 @@ if st.button("Show Correlation Heatmap"):
 
         if not numeric_data.empty:
             correlation_matrix = numeric_data.corr()
-            fig = px.imshow(correlation_matrix, text_auto=True)
+            fig = px.imshow(correlation_matrix, text_auto=True, width=800, height=600)
             st.plotly_chart(fig)
         else:
             st.warning("The dataset does not contain numeric columns for correlation.")
