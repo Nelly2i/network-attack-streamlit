@@ -12,17 +12,17 @@ import plotly.express as px
 model = load_model('Leslie_network_attack_model.h5')
 
 # Defining the selected feature names
-top_10_features = [
-    'dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 
-    'count', 'dst host count', 'dst host same src port rate', 'diff srv rate', 
-    'service_eco_i', 'src bytes', 'dst host diff srv rate'
-]
+top_10_features = ['dst host srv diff host rate', 'same srv rate', 'dst host same srv rate', 'count', 'dst host count',
+                   'dst host same src port rate', 'diff srv rate', 'service_eco_i', 'src bytes', 'dst host diff srv rate']
 
 # Streamlit app title
 st.title("Network Attack Prediction App")
 
 # Uploading dataset for prediction
 uploaded_file = st.file_uploader("Upload your dataset (CSV)", type=["csv"], key='unique_uploader')
+
+# Attack mapping
+attack_mapping = {0: 'ipsweep', 1: 'satan', 2: 'portsweep', 3: 'back', 4: 'normal'}
 
 # Checking if a file is uploaded
 if uploaded_file is not None:
@@ -50,35 +50,26 @@ if uploaded_file is not None:
             # Button to trigger prediction
             if st.button("Predict"):
                 try:
-                    # Checking for non-numeric values and encode them if necessary
-                    for col in filtered_data.columns:
-                        if filtered_data[col].dtype == 'object':  # If the column is categorical
-                            st.write(f"Encoding column: {col}")
-                            filtered_data[col] = filtered_data[col].astype('category').cat.codes
-
-                    # Converting the filtered data to NumPy array and reshape for prediction
+                    # Converting the filtered data to NumPy array for prediction
                     data_for_prediction = np.array(filtered_data).astype(np.float32)
 
-                    # Reshaping the data to match the input shape of the model (batch_size, sequence_length, num_features)
-                    data_for_prediction = data_for_prediction.reshape(data_for_prediction.shape[0], 1, data_for_prediction[1])
-
+                    # Note: Don't reshape the data to (batch_size, 1, num_features), just keep it as (batch_size, num_features)
                     # Making predictions
                     predictions = model.predict(data_for_prediction)
 
-                    # Mapping prediction to attack types
-                    attack_mapping = {0: 'ipsweep', 1: 'satan', 2: 'portsweep', 3: 'back', 4: 'normal'}
+                    # Converting predictions to class labels
                     predicted_classes = np.argmax(predictions, axis=1)
-                    predicted_attacks = [attack_mapping[cls] for cls in predicted_classes]
+                    predicted_attacks = [attack_mapping[p] for p in predicted_classes]
 
-                    # Creating DataFrame for results
-                    results = pd.DataFrame({
-                        'Id': data.index,
-                        'type_of_attack': predicted_attacks
-                    })
+                    # Displaying predictions
+                    st.write("Predicted Classes:")
+                    st.write(predicted_attacks)
 
-                    # Display the results
-                    st.write("Prediction Results:")
-                    st.write(results)
+                    # Saving predictions to a CSV file
+                    result_df = pd.DataFrame({'Id': data.index, 'type_of_attack': predicted_attacks})
+                    result_df.to_csv('predicted_attacks.csv', index=False)
+                    st.write("Download the predictions:", result_df)
+                    st.download_button(label="Download CSV", data=result_df.to_csv(index=False), file_name='predicted_attacks.csv', mime='text/csv')
 
                 except KeyError as e:
                     st.error(f'Error: {e}. Please ensure the dataset contains the necessary features.')
@@ -89,20 +80,20 @@ if uploaded_file is not None:
             st.error("The uploaded dataset does not contain the required feature columns.")
 
     except Exception as e:
-        st.error(f"An error occurred while processing the data: {e}")
+        st.error(f"An error occurred: {e}")
 
-# Correlation Heatmap using Plotly
+# Example: Correlation heatmap
 if st.button("Show Correlation Heatmap"):
     try:
-        # Select only numeric columns for correlation
-        numeric_columns = data.select_dtypes(include=[np.number])
+        # Selecting only the numeric columns for correlation
+        numeric_data = data.select_dtypes(include=[np.number])
 
-        # Compute the correlation matrix
-        correlation_matrix = numeric_columns.corr()
-
-        # Plotting the correlation heatmap using Plotly
-        fig = px.imshow(correlation_matrix, text_auto=True)
-        st.plotly_chart(fig)
+        if not numeric_data.empty:
+            correlation_matrix = numeric_data.corr()
+            fig = px.imshow(correlation_matrix, text_auto=True)
+            st.plotly_chart(fig)
+        else:
+            st.warning("The dataset does not contain numeric columns for correlation.")
 
     except Exception as e:
         st.error(f"An error occurred while generating the heatmap: {e}")
